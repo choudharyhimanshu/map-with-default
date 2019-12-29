@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: node:latest
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run: npm install
+      - save_cache:
+          paths:
+            - ~/repo/node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run format
+      - run: npm test
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - test
